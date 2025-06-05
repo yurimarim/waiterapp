@@ -46,8 +46,11 @@ export const ModalBody = styled.div`
     div {
       margin-top: 8px;
       display: flex;
-      gap: 2px;
       align-items: center;
+
+      strong {
+        margin-left: 4px;
+      }
     }
   }
 `;
@@ -117,6 +120,11 @@ export const Actions = styled.footer`
   display: flex;
   flex-direction: column;
   margin-top: 32px;
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
 
   .primary {
