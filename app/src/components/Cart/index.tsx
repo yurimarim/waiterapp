@@ -4,6 +4,7 @@ import { OrderConfirmedModal } from '../../OrderConfirmedModal';
 import type { ICartItem } from '../../types/ICartItem';
 import type { IProduct } from '../../types/IProduct';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { httpClient } from '../../utils/httpClient';
 import { Button } from '../Button';
 import { MinusCircle } from '../Icons/MinusCircle';
 import { PlusCircle } from '../Icons/PlusCircle';
@@ -21,20 +22,40 @@ import {
 
 interface ICartProps {
 	cartItems: ICartItem[];
+	selectedTable: string;
 	onAdd(product: IProduct): void;
 	onDecrement(product: IProduct): void;
 	onConfirmOrder(): void;
 }
 
-export function Cart({ cartItems, onAdd, onDecrement, onConfirmOrder }: ICartProps) {
-	const [isLoading] = useState(false);
+export function Cart({
+	cartItems,
+	selectedTable,
+	onAdd,
+	onDecrement,
+	onConfirmOrder
+}: ICartProps) {
+	const [isLoading, setIsLoading] = useState(false);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const total = cartItems.reduce((acc, cartItem) => {
 		return acc + cartItem.quantity * cartItem.product.price;
 	}, 0);
 
-	function handleConfirmOrder() {
+	async function handleConfirmOrder() {
+		setIsLoading(true);
+
+		const payload = {
+			table: selectedTable,
+			products: cartItems.map((cartItem) => ({
+				product: cartItem.product._id,
+				quantity: cartItem.quantity
+			}))
+		};
+
+		await httpClient.post('/orders', payload);
+
+		setIsLoading(false);
 		setIsModalVisible(true);
 	}
 
